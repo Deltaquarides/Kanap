@@ -76,7 +76,7 @@ function displaydata(kanap){
     price: Number(price),
     color: color,
     quantity: Number(quantity),
-    img: img,
+    img: img
    }
  
 
