@@ -12,7 +12,10 @@ function getOrderId(){
 function displayOrderId(id){
     const orderElement = document.getElementById("orderId")
     orderElement.innerHTML = id;  
+    localStorage.clear();
+
 }
 
 // appel de la fonction.
 getOrderId()
+//enlever le local storage clear

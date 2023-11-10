@@ -7,11 +7,13 @@ console.log(productStorage)
 
  // Si le panier est vide, on affichera un message.  Le prix ainsi que la quantité sera initialisé à 0.
 // n'arrive pas a mettre dans une fonction, solution appeler la fonction.
+
+
        function panierVide(){
-        if(productStorage.length === 0){ //productStorage == ""|| productStorage === null
-        document.querySelector("h1").innerHTML = "Votre panier est vide";
-        document.querySelector(".cart__price ").innerHTML = 
-        '<p>Total (<span id="totalQuantity">0</span> articles) : <span id="totalPrice">0</span> €</p>';
+        if( productStorage.length === 0 ){ //productStorage == ""|| productStorage === null
+            document.querySelector(".cartAndFormContainer h1").innerHTML = "Votre panier est vide";
+            document.querySelector(".cart__price ").innerHTML =  '<p>Total (<span id="totalQuantity">0</span> articles) : <span id="totalPrice">0</span> €</p>';
+        
             } else{
                 for (let cartdata of productStorage) {
                 displaycart(cartdata)   
@@ -100,7 +102,7 @@ function displaycart(cartdata) {
     //----------Création input----------------------------
     let cartInput = document.createElement("input");
     cartInput.className = "itemQuantity";
-    cartInput.name = "itemQuantity"
+    //cartInput.name = "itemQuantity"
     cartInput.value = cartdata.quantity
     cartInput.setAttribute("type", "number");
     cartInput.setAttribute("name", "itemQuantity");
@@ -108,17 +110,35 @@ function displaycart(cartdata) {
     cartInput.max = "100";
     cartInput.setAttribute("value", "42");
     cartDivSettingsQuantity.appendChild(cartInput);
-    cartInput.addEventListener("input",
-        () => saveToStorage(cartdata.id, cartInput.value))
+    cartInput.addEventListener("input",function(e) {
+
+        let num = this.value.match("^([1-9]|[1-9][0-9]|100)$");
+        if (num === null|| num == true) {
+            
+            
+           // checkNumber(cartInput)
+            this.value = "1";
+            alert('choississez entre un nombre compris entre 1 et 100.')
+
+        }else{}
+        
+    
+            saveToStorage(cartdata.id,cartInput.value, cartQuantity, e)  // cartInput.value
+  
+            //checkNumber(cartInput)
+        
+        
+        });
 
 
     //--------- -----Création div delete----------------------------------
     let cartDivDelete = document.createElement("div");
     cartDivDelete.className = "cart__item__content__settings__delete";
     cartDivSettingsQuantity.appendChild(cartDivDelete);
-    cartDivDelete.addEventListener("click", () => {
-
+    cartDivDelete.addEventListener("click", () => {   
+        
         popupDelete(productStorage,cartdata)
+  
 
     });
 
@@ -127,8 +147,11 @@ function displaycart(cartdata) {
     cartDelete.className = "deleteItem";
     cartDelete.innerHTML = "Supprimer";
     cartDivDelete.appendChild(cartDelete);
+ 
+    
     totalquantityProduct()
     totalPriceProduct()
+    
     
 }
 
@@ -145,43 +168,46 @@ function totalPriceProduct() {
     //ajouter le "0" dans la methode reduce sinon message d'erreure
     let totalPriceCart = arrayPriceCart.reduce((a, b) => a + b,0);
     console.log(totalPriceCart);
-    document.querySelector("#totalPrice").innerHTML = totalPriceCart;
-}
 
+    document.querySelector("#totalPrice").innerHTML = parseInt(totalPriceCart);
+
+}
 //--------------- Calcul de la Quantité total des produits-----------
 
 function totalquantityProduct() {
  
     let totalQuantity = productStorage.map(product => product.quantity)
-        .reduce((a, b) => a + b,0);
-    document.querySelector("#totalQuantity").innerHTML = totalQuantity;
+        .reduce((a, b) => a + b,0);    
+        
 
+    document.querySelector("#totalQuantity").innerHTML = totalQuantity;
 }
 
 //--------------------AddEvenListener pour calculer les nouvelles valeurs----------------------------------
 
-function saveToStorage(id, newValue) {
+function saveToStorage(id,newvalue, cartQuantity, e) { //newValue
+    e.preventDefault();
 
-    const cartToUpdate = productStorage.find(item => item.id === id)
-    cartToUpdate.quantity = Number(newValue)
-    console.log(productStorage)
-    console.log(cartToUpdate)
-    localStorage.setItem("cart", JSON.stringify(productStorage))
+    let cartToUpdate = productStorage.find(item => item.id === id)
+     cartToUpdate.quantity = Number(newvalue)
+     cartQuantity.innerHTML = cartToUpdate.quantity
+     
+    //let price =document.querySelector('.cart__item__content__settings__quantity p ').innerHTML =  cartToUpdate.quantity
+        console.log(productStorage)
+        console.log(cartToUpdate)
+      
+        localStorage.setItem("cart", JSON.stringify(productStorage))    
+       
+
     totalquantityProduct()
     totalPriceProduct()
+
+
 }
 
 
 //------------------------- Gestion du button supprimé de l'article -----------
 
-/*function deleteListener(productStorage){
-let buttonDelete = document.querySelectorAll(".cart__item__content__settings").
-forEach(item => {         
-  item.addEventListener('click', () => deleteProduct(productStorage))
-  //() => deleteProduct(productStorage)
- 
-})
-}*/
  function popupDelete(productStorage,cartdata){
     const response =confirm("Vous êtes sur le point de supprimer un article de votre panier. Voulez-vous continuer ?");
     if(response){
@@ -190,7 +216,9 @@ forEach(item => {
     }
  }
 
-function deleteProduct (productStorage,cartdata){
+function deleteProduct (productStorage,cartdata,){
+ 
+   
  //besoin que de l'index (findindex) et non de lobjet entier avec ses values avec (find) method
  //avec la methode (delete) larray contient un objet effacé vide mais vide contrairement a la methode splice
     let found = productStorage.findIndex((item)=>item.id=== cartdata.id) 
@@ -206,102 +234,81 @@ function deleteProduct (productStorage,cartdata){
 
 //-------------- Gestion du boutton commander-----------------
 
- //narrive pas a mettre adeventlistener dans une fonction
 
     const orderButton = document.querySelector('#order');
     orderButton.addEventListener('click', (e) => submitForm(e))
 
     //s'il manque des informations dans le formulaire on change la couleur en rouge de l'input vide
-    //et affichage message d'erreure dans la formulaire
+    //et affichage un popup  d'erreure dans la formulaire
     
 function errorMessage(){
 
-   const errmessage = document.querySelectorAll('.cart__order__form__question'); // nodelist de tout les divs du formaulaire
+   const errmessage = document.querySelectorAll('.cart__order__form__question input'); // nodelist de tout les inputs du formaulaire.
 
- for (i=0;i < errmessage.length ; i++){
-
-    if(errmessage[i].children[1].value == ''){
-        errmessage[i].children[1].style.border = "1px solid red"
-         errmessage[i].children[2].innerHTML = "Erreure champ vide, veuillez remplir votre " + errmessage[i].children[1].id+".";
-  return true
-    }else{
-    errmessage[i].children[1].style.border = "white";
-    errmessage[i].children[2].innerHTML = "";
-}
- }
-
-// function checkEmptyForm(){
-
-//     const form = document.querySelector(".cart__order__form");
-    
-//     for(let i = 0; i < form.length; i++){
-//         if(form[i].value == ""){   
-//             errorMessage()
-      
-//             form[i].style.border= '1px solid red';
-//         }else{
-//             form[i].style.border= 'white';
-            
-//         }      
-//     }
-// }
-//     errmessage.forEach(function(errors){ // nous donne tout les divs =errors
-// if(errors.children[2].value == ""){
-//     errors.children[1].innerHTML ="erreure"
-// }
-//       //   errors.innerHTML = " vous avez fait une erreure";
-//     //   console.log(errors)
-//     })
-
+errmessage.forEach( (input) => {
+    if (input.value === ''){
+        alert('Erreure champ vide, veuillez remplir tout les champs')
+    }
+})
 }
 
+
+
+//------------------------------------------ regex pour le formulaire----------------------------
 function firstNameValidation(){
     const f = requestBody() 
+    let nameError = document.getElementById('firstNameErrorMsg');
+
     const checkFirstname = f.contact.firstName;
     const regexName = /^[A-Za-z éèëôîï-]+$/gm ;
 
     if (regexName.test(checkFirstname)){
+        nameError.innerText = '';
         return true;
     }else{
-        let nameError = document.getElementById('firstNameErrorMsg');
         nameError.innerText = "Le nom n'est pas valide";
     }
   }
 
   function lastName(){
-    const l = requestBody() 
+    const l = requestBody()
+    let lastNameError = document.getElementById('lastNameErrorMsg');
+ 
     const checkLastName = l.contact.lastName;
     const regexLastName = /^[A-Za-z éèëôîï-]+$/g;
 
     if(regexLastName.test(checkLastName)){
+        lastNameError.innerText = '';
         return true
     }else{
-        let lastNameError = document.getElementById('lastNameErrorMsg');
         lastNameError.innerText = "Le prénom n'est pas valide."
     }
   }
 
   function address(){
     const a = requestBody() 
+    let addressError = document.getElementById('addressErrorMsg');
+
     const checkAddress = a.contact.address;
-    const regexAddress = /[A-Za-zéèëôîï0-9\'\.\-\s\,]{1,}/g; 
+    const regexAddress = /[A-Za-zéèëôîï0-9\'\.\-\s\,]{2,}/g; 
     if(regexAddress.test(checkAddress)){
+        addressError.innerText ='';
         return true
     }else{
-        let addressError = document.getElementById('addressErrorMsg');
-        addressError.innerText = "Le prénom n'est pas valide."
+        addressError.innerText = "L'adresse n'est pas valide."
     }
   }
 
   function city(){
     const c = requestBody()
-    //const checkCity = document.getElementById('cityErrorMsg');
+    let cityError = document.getElementById('cityErrorMsg'); 
+
     const checkCity = c.contact.city;
-    const regexCity = /[a-zA-Z\'\.\-\s\,]{1,23}/g;
+    const regexCity = /[a-zA-Z\'\.\-\s\,]{1,23}\D/g;
     if(regexCity.test(checkCity)){
+        cityError.innerText = '';
         return true
     }else{
-        let cityError = document.getElementById('cityErrorMsg'); 
         cityError.innerText = "La ville n'est pas valide."
     }
     
@@ -311,22 +318,23 @@ function emailValidation() {
         // const email = document.getElementById('email').value; 
     const e = requestBody()  
     const checkEmail = e.contact.email;
+    let emailError = document.getElementById('emailErrorMsg');
+
   
    const regexEmail = /^([\w](\.|_)?)+[\w]\@([A-Z|a-z|0-9])+((\.){0,1}[A-Z|a-z|0-9]){2}\.[a-z]{2,3}$/gm;
    
     if (regexEmail.test(checkEmail)) {
+        emailError.innerText = '';
       return true;
     } else {
-      let emailError = document.getElementById('emailErrorMsg');
       emailError.innerText = "Adresse e-mail non valide";     
     }
   } 
 
 
-
     function submitForm(e){
         e.preventDefault()
-      if(errorMessage()) {return}
+      if(errorMessage() ) {return}
        if(!firstNameValidation() || !lastName() || !emailValidation() || !address() || !city()) {return}
 
         if (productStorage.length === 0 ) {
@@ -387,12 +395,3 @@ function emailValidation() {
   return ids                //valeur de retour de la fonction
 }
 
-// l’objet contact envoyé au serveur doit contenir les champs firstName,
-// lastName, address, city et email. Le tableau des produits envoyé au back-end doit être un
-// array de strings product-ID
-
-        //  const form = document.querySelector('.cart__order__form');
-        // const formData = new FormData(form);
-        // for( item of formData){
-        //      console.log(item[0], item[1])
-        // Array.from(formData)
