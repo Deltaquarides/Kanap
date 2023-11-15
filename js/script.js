@@ -1,6 +1,10 @@
 
 const KanapProducts = fetch ("http://localhost:3000/api/products")
-.then ((resp) => resp.json())
+.then ((resp) => {
+  if(resp.ok) {
+     return resp.json();
+    }
+})
 .then ((data)=> {
     console.log(data);    
       array(data)   

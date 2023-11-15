@@ -1,5 +1,6 @@
 // ----------------------Récupérer et afficher tout les articles ajoutés dans le localstorage  par l'utilisateur------
-let productStorage = JSON.parse(localStorage.getItem("cart"));
+let productStorage = [];
+ productStorage = JSON.parse(localStorage.getItem("cart"));
 
 //console.log(productStorage);    //acceder a la valeur dun object precis : productStorage[0].name
 
@@ -10,18 +11,15 @@ console.log(productStorage)
 
 
        function panierVide(){
-        if( productStorage.length === 0 ){ //productStorage == ""|| productStorage === null
-            document.querySelector(".cartAndFormContainer h1").innerHTML = "Votre panier est vide";
-            document.querySelector(".cart__price ").innerHTML =  '<p>Total (<span id="totalQuantity">0</span> articles) : <span id="totalPrice">0</span> €</p>';
-        
-            } else{
-                for (let cartdata of productStorage) {
+
+        document.querySelector(".cartAndFormContainer h1").innerHTML = "Votre panier est vide";
+        document.querySelector(".cart__price ").innerHTML =  '<p>Total (<span id="totalQuantity">0</span> articles) : <span id="totalPrice">0</span> €</p>';
+        if (productStorage){
+            for (let cartdata of productStorage) {
                 displaycart(cartdata)   
                 }
-            } 
-
         }
-
+    }
         panierVide()
     
 //---------------------------------Affichage des produits du panier------------------------------------------------------------------
@@ -121,13 +119,8 @@ function displaycart(cartdata) {
             alert('choississez entre un nombre compris entre 1 et 100.')
 
         }else{}
-        
-    
-            saveToStorage(cartdata.id,cartInput.value, cartQuantity, e)  // cartInput.value
-  
-            //checkNumber(cartInput)
-        
-        
+            
+            saveToStorage(cartdata.id,cartInput.value, cartQuantity, e)         
         });
 
 
@@ -167,7 +160,6 @@ function totalPriceProduct() {
     });
     //ajouter le "0" dans la methode reduce sinon message d'erreure
     let totalPriceCart = arrayPriceCart.reduce((a, b) => a + b,0);
-    console.log(totalPriceCart);
 
     document.querySelector("#totalPrice").innerHTML = parseInt(totalPriceCart);
 
@@ -191,12 +183,8 @@ function saveToStorage(id,newvalue, cartQuantity, e) { //newValue
     let cartToUpdate = productStorage.find(item => item.id === id)
      cartToUpdate.quantity = Number(newvalue)
      cartQuantity.innerHTML = cartToUpdate.quantity
-     
-    //let price =document.querySelector('.cart__item__content__settings__quantity p ').innerHTML =  cartToUpdate.quantity
-        console.log(productStorage)
-        console.log(cartToUpdate)
       
-        localStorage.setItem("cart", JSON.stringify(productStorage))    
+     localStorage.setItem("cart", JSON.stringify(productStorage))    
        
 
     totalquantityProduct()
@@ -247,7 +235,7 @@ function errorMessage(){
 
 errmessage.forEach( (input) => {
     if (input.value === ''){
-        alert('Erreure champ vide, veuillez remplir tout les champs')
+        alert('Erreure champ vide, veuillez remplir tout les champs ')
     }
 })
 }
@@ -266,7 +254,8 @@ function firstNameValidation(){
         nameError.innerText = '';
         return true;
     }else{
-        nameError.innerText = "Le nom n'est pas valide";
+        nameError.innerText = "Le prénom n'est pas valide";
+        return false;
     }
   }
 
@@ -281,7 +270,8 @@ function firstNameValidation(){
         lastNameError.innerText = '';
         return true
     }else{
-        lastNameError.innerText = "Le prénom n'est pas valide."
+        lastNameError.innerText = "Le nom n'est pas valide."
+        return false;
     }
   }
 
@@ -296,6 +286,7 @@ function firstNameValidation(){
         return true
     }else{
         addressError.innerText = "L'adresse n'est pas valide."
+        return false;
     }
   }
 
@@ -310,6 +301,7 @@ function firstNameValidation(){
         return true
     }else{
         cityError.innerText = "La ville n'est pas valide."
+        return false;
     }
     
   }
@@ -328,6 +320,7 @@ function emailValidation() {
       return true;
     } else {
       emailError.innerText = "Adresse e-mail non valide";     
+      return false;
     }
   } 
 
@@ -335,7 +328,7 @@ function emailValidation() {
     function submitForm(e){
         e.preventDefault()
       if(errorMessage() ) {return}
-       if(!firstNameValidation() || !lastName() || !emailValidation() || !address() || !city()) {return}
+       if(!firstNameValidation() || !lastName() || !emailValidation() || !address() || !city()) { return}
 
         if (productStorage.length === 0 ) {
             alert("Veuillez choisir un article")   

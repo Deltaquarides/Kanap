@@ -5,7 +5,6 @@ const id = searchParams.get("id");
 fetch(`http://localhost:3000/api/products/${id}`)
 .then ((resp) => resp.json())
 .then ((data)=> {
-    console.log(data);
     displaydata(data);
 })
 
@@ -67,7 +66,6 @@ function displaydata(kanap){
         const quantity = document.querySelector('#quantity').value 
 
         const img = kanap.imageUrl;
-        console.log(img)
 
      // Récupération des article à mettre dans le panier
    const article= {
@@ -107,10 +105,16 @@ function displaydata(kanap){
          element.id === article.id && element.color === article.color);
          if(found){    
             let totalQuantity = found.quantity + article.quantity;
-            found.quantity = totalQuantity;
-            localStorage.setItem("cart",JSON.stringify(productStorage));
-            console.log(productStorage);
-            popupConfirmation(article);
+            found.quantity = totalQuantity;  
+               if(totalQuantity > 100) {
+                alert('Le total des articles ne doivent pas dépasser 100')
+            }else{
+                localStorage.setItem("cart",JSON.stringify(productStorage));
+                console.log(productStorage);
+                popupConfirmation(article);
+               }
+
+           
          }else{
 
     productStorage.push(article);
@@ -140,10 +144,10 @@ else{
 Appuyer sur OK pour retourner à l'accueil
 Annuler pour aller au panier`);
         if(response){
-            // window.location.href = "index.html"
+             window.location.href = "index.html"
         }else{
-           // window.location.href = "cart.html"
+            window.location.href = "cart.html"
     
         }
     }      
-    
+
