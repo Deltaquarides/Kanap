@@ -98,6 +98,7 @@ function displaydata(kanap){
         let productStorage = JSON.parse(localStorage.getItem("cart"))
 
 // S'il y a des produits dans le local storage
+// // Si le produit et la couleur choisis est deja exitant on incrémente la quantité.
  if (productStorage){
    // const found = array1.find((element) => element > 10);
     let found = productStorage.find(
@@ -109,6 +110,8 @@ function displaydata(kanap){
                if(totalQuantity > 100) {
                 alert('Le total des articles ne doivent pas dépasser 100')
             }else{
+        
+ //Si le produit et la couleur choisis n'existe pas encore on le rajoute dans le localstorage
                 localStorage.setItem("cart",JSON.stringify(productStorage));
                 console.log(productStorage);
                 popupConfirmation(article);
